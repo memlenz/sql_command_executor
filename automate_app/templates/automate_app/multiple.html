@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="mt-5">
+        <div class="flex-column">
+            <div class="row justify-content-center">
+                {% if messages %}
+                <div class="card">
+                    <div class="card-body">
+                        <ul>
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card mt-3 col-md-6">
+                    <div class="card-header">
+                        <h1>Recherche en masse</h1>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" enctype="multipart/form-data">
+                            {% csrf_token %}                            
+                            {{ csvForm|crispy }}
+                            {{ form|crispy}}
+                            <button type="submit" class="btn btn-primary mt-3">Rechercher</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            {% if resultats_list %}
+                <div class="row justify-content-center">
+                    <div class="card m-5 col-md-10">
+                        <div class="card-header">
+                            <h3>Résultats de la recherche ({{ resultats_list|length }} trouvés)</h3>
+                        </div>
+                        <div class="card-body">
+                            {% if resultats_list|length > 0 %}
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            {% for key in resultats_list.0.keys %}
+                                                <th>{{ key|title }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for item in resultats_list %}
+                                        <tr>
+                                            {% for value in item.values %}
+                                                <td>{{ value|default:"-" }}</td>
+                                            {% endfor %}
+                                        </tr>
+                                        {% empty %}
+                                        <tr>
+                                            <td colspan="3">Aucun résultat trouvé</td>
+                                        </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>  
+{% endblock content %}

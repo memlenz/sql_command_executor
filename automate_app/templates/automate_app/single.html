@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load crispy_forms_filters %}
+{% load crispy_forms_tags %}
+
+{% block content %}
+    <div class="mt-5">
+        <div class="flex-column">
+            <div class="row justify-content-center">
+                {% if messages %}
+                <div class="card">
+                    <div class="card-body">
+                        <ul>
+                        {% for message in messages %}
+                            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                        {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+                {% endif %}
+                <div class="card mt-3 col-md-6">
+                    <div class="card-header">
+                        <h1>Recherche d'individu</h1>
+                    </div>
+                    <div class="card-body">
+                        <form method="post" novalidate>
+                            {% csrf_token %}
+                            {{ form|crispy }}
+                            <button type="submit" class="btn btn-primary mt-3">Rechercher</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            
+            {% if resultats %}
+                <div class="row justify-content-center">
+                    <div class="card m-5 col-md-10">
+                        <div class="card-header">
+                            <h1>Résultats de la recherche</h1>
+                        </div>
+                        <div class="card-body">
+                            {% if resultats|length > 0 %}
+                                <table class="table table-hover">
+                                    <thead>
+                                        <tr>
+                                            {% for key in resultats.0.keys %}
+                                                <th scope="col">{{ key|title }}</th>
+                                            {% endfor %}
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {% for individu in resultats %}
+                                            <tr{% if forloop.counter|divisibleby:2 %} class="table-secondary"{% endif %}>
+                                                {% for value in individu.values %}
+                                                    <td>{{ value }}</td>
+                                                {% endfor %}
+                                            </tr>
+                                        {% endfor %}
+                                    </tbody>
+                                </table>
+                            {% else %}
+                                <div class="alert alert-info">
+                                    Aucun résultat trouvé pour cette recherche.
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+{% endblock content %}
